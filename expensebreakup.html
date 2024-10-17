@@ -1,0 +1,183 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+
+<body x-data :class="$store.darkMode.on && 'bg-black'">
+	<div>
+		<div class="flex flex-row  justify-center items-center bg-purple-400 p-4 " :class="$store.darkMode.on && 'bg-slate-500'">
+			<h3 class="text-balance text-xl lg:text-2xl font-bold text-black dark:text-white" aria-describedby="tripDescription">Expense Breakup </h3>
+		</div>
+		<div class="flex flex-row  justify-center items-center text-blue-700 bg-white-400 p-1 ">
+			<div x-data="timecomponent()" x-init="init()">
+				<div>
+					<span x-text="getTime()">
+					</span>
+					<br />
+					<div>
+						<input type="text" placeholder="" style="width:100%;color:red" :class="$store.darkMode.on && 'bg-black'" />
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="flex flex-row  justify-end bg-white-400 p-1 ">
+			<button class="text-blue-600">Toggle Dark Mode</button>
+			<label for="defaultToggle" class="inline-flex cursor-pointer items-center gap-3">
+				<input id="defaultToggle" type="checkbox" class="peer sr-only" role="switch" x-on:click="$store.darkMode.toggle()" />
+				<span class="trancking-wide text-sm font-medium text-slate-700 peer-checked:text-black peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-slate-300 dark:peer-checked:text-white"></span>
+				<div class="relative h-6 w-11 after:h-5 after:w-5 peer-checked:after:translate-x-5 rounded-full border border-slate-300 bg-slate-100 after:absolute after:bottom-0 after:left-[0.0625rem] after:top-0 after:my-auto after:rounded-full after:bg-slate-700 after:transition-all after:content-[''] peer-checked:bg-blue-700 peer-checked:after:bg-slate-100 peer-focus:outline peer-focus:outline-2 peer-focus:outline-offset-2 peer-focus:outline-slate-800 peer-focus:peer-checked:outline-blue-700 peer-active:outline-offset-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:border-slate-700 dark:bg-slate-800 dark:after:bg-slate-300 dark:peer-checked:bg-blue-600 dark:peer-checked:after:bg-slate-100 dark:peer-focus:outline-slate-300 dark:peer-focus:peer-checked:outline-blue-600" aria-hidden="true"></div>
+			</label>
+		</div>
+		<div class="flex flex-row  justify-center items-center  p-1 ">
+			<article :class="$store.darkMode.on && 'bg-slate-500'" class="group flex rounded-xl max-w-sm flex-col overflow-hidden border border-slate-300 bg-slate-100 text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+				<div class="flex flex-col gap-4 p-6">
+					<div class="grid grid-cols-3 gap-0 text-blue-600 text-center " :class="$store.darkMode.on && 'text-slate-100'">
+						<div>Total Flats <br />
+							<span x-text="$store.calculations.data.TotalFlats" class="rounded-xl w-fit border border-slate-700 bg-slate-800 px-2 py-1 text-xs font-medium text-slate-300 dark:border-slate-300 dark:bg-slate-100 dark:text-slate-700"></span>
+						</div>
+						<div> High Rise <br /><span x-text="$store.calculations.data.TotalHighRise" class="rounded-xl w-fit border border-red-600 bg-red-600 px-2 py-1 text-xs font-medium text-white dark:border-red-600 dark:bg-red-600 dark:text-white"></span>
+						</div>
+						<div> Low Rise <br />
+							<span x-text="$store.calculations.data.TotalLowRise" class="rounded-xl w-fit border border-amber-500 bg-amber-500 px-2 py-1 text-xs font-medium text-white dark:border-amber-500 dark:bg-amber-500 dark:text-white"></span>
+						</div>
+					</div>
+					<div class="flex  flex-wrap flex-row  justify-center items-center  p-1 gap-0 text-blue-600 text-center " :class="$store.darkMode.on && 'text-slate-100'">
+						<div> High Rise <br />
+							<div>
+								<template x-for="block in $store.calculations.data.Blocks" :key="block.Block">
+									<template x-if="block.Type == 'HighRise'">
+										<span x-text="block.Block" class="mx-1	 rounded-xl w-fit border border-red-600 bg-red-600 px-2 py-1 text-xs font-medium text-white dark:border-red-600 dark:bg-red-600 dark:text-white"></span>
+									</template>
+								</template>
+							</div>
+						</div>
+						<div> Low Rise <br />
+							<div>
+								<template x-for="block in $store.calculations.data.Blocks" :key="block.Block">
+									<template x-if="block.Type == 'LowRise'">
+										<span x-text="block.Block" class="mx-1 rounded-xl w-fit border border-amber-500 bg-amber-500 px-2 py-1 text-xs font-medium text-white dark:border-amber-500 dark:bg-amber-500 dark:text-white"></span>
+									</template>
+								</template>
+							</div>
+						</div>
+					</div>
+					<span id="txtDescription" class="text-pretty text-sm mb-2" x-data="{ message: 'Enter Amount To calculate breakup ❤️ ' }" x-text="message"></span>
+					<div class="flex w-full max-w-xs flex-col gap-0 text-slate-700 dark:text-slate-300">
+						<input x-model="$store.calculations.amount" id="txtAmount" type="number" class="text-red-400 
+w-full rounded-xl border border-slate-300  px-2 py-2 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-not-allowed disabled:opacity-75 dark:border-slate-700  dark:focus-visible:outline-blue-600" name="amount" placeholder="Enter  Amount" />
+					</div>
+					<button @click="$store.calculations.calculate()" type="button" class="cursor-pointer whitespace-nowrap bg-blue-700 px-4 py-2 text-center text-sm font-medium tracking-wide text-slate-100 transition hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 active:opacity-100 active:outline-offset-0 dark:bg-blue-600 dark:text-slate-100 dark:focus-visible:outline-blue-600 rounded-xl">Calculate</button>
+					<div class="grid grid-cols-2 gap-0 text-blue-600 text-center " :class="$store.darkMode.on && 'text-slate-100'">
+						<div> High Rise Total <br /><span x-text="$store.calculations.totalhighamount" class="rounded-xl w-fit border border-slate-700 bg-slate-800 px-2 py-1 text-xs font-medium text-slate-300 dark:border-slate-300 dark:bg-slate-100 dark:text-slate-700"></span>
+						</div>
+						<div> Low Rise Total<br />
+							<span x-text="$store.calculations.totallowamount" class="rounded-xl w-fit border border-slate-700 bg-slate-800 px-2 py-1 text-xs font-medium text-slate-300 dark:border-slate-300 dark:bg-slate-100 dark:text-slate-700"></span>
+						</div>
+					</div>
+					<div class="grid grid-cols-2 gap-0 text-blue-600 text-center " :class="$store.darkMode.on && 'text-slate-100'">
+						<div> High Rise Individual <br /><span x-text="$store.calculations.totalhighamountindividual" class="rounded-xl w-fit border border-red-600 bg-red-600 px-2 py-1 text-xs font-medium text-white dark:border-red-600 dark:bg-red-600 dark:text-white"></span>
+						</div>
+						<div> Low Rise Individual<br />
+							<span x-text="$store.calculations.totallowamountindividual" class="rounded-xl w-fit border border-amber-500 bg-amber-500 px-2 py-1 text-xs font-medium text-white dark:border-amber-500 dark:bg-amber-500 dark:text-white"></span>
+						</div>
+					</div>
+				</div>
+			</article>
+		</div>
+	</div>
+	<script>
+	document.addEventListener('alpine:init', () => {
+		Alpine.store('darkMode', {
+				on: false,
+				toggle() {
+					this.on = !this.on
+				}
+			}),
+			Alpine.store('calculations', {
+				amount: 25000,
+				totalhighamount: 0,
+				totallowamount: 0,
+				totalhighamountindividual: 0,
+				totallowamountindividual: 0,
+				data: {
+					"TotalFlats": 1130,
+					"TotalHighRise": 920,
+					"TotalLowRise": 210,
+					"Blocks": [{
+						"Block": "D&E",
+						"Type": "HighRise"
+					}, {
+						"Block": "H",
+						"Type": "HighRise"
+					}, {
+						"Block": "F",
+						"Type": "HighRise"
+					}, {
+						"Block": "I",
+						"Type": "HighRise"
+					}, {
+						"Block": "J",
+						"Type": "HighRise"
+					}, {
+						"Block": "M",
+						"Type": "HighRise"
+					}, {
+						"Block": "R",
+						"Type": "HighRise"
+					}, {
+						"Block": "S",
+						"Type": "HighRise"
+					}, {
+						"Block": "A",
+						"Type": "LowRise"
+					}, {
+						"Block": "B",
+						"Type": "LowRise"
+					}, {
+						"Block": "C",
+						"Type": "LowRise"
+					}, {
+						"Block": "T",
+						"Type": "LowRise"
+					}, {
+						"Block": "U",
+						"Type": "LowRise"
+					}]
+				},
+				calculate() {
+					var highriseno = this.data.Blocks.filter(function(block) {
+						return block.Type == 'HighRise';
+					}).length
+					var lowriseno = this.data.Blocks.filter(function(block) {
+						return block.Type == 'LowRise';
+					}).length
+					this.totalhighamount = Math.round((this.data.TotalHighRise * this.amount) / this.data.TotalFlats);
+					this.totallowamount = Math.round((this.data.TotalLowRise * this.amount) / this.data.TotalFlats);
+					this.totalhighamountindividual = Math.round(this.totalhighamount / highriseno);
+					this.totallowamountindividual = Math.round(this.totallowamount / lowriseno);
+				}
+			})
+	})
+
+	function timecomponent() {
+		return {
+			time: new Date(),
+			init() {
+				setInterval(() => {
+					this.time = new Date();
+				}, 2000);
+			},
+			getTime() {
+				return this.time
+			},
+		}
+	}
+	</script>
+</body>
+
+</html>
